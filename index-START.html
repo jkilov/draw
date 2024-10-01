@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<button id="test">CLEAR</button>
+<script>
+
+const test = document.getElementById("test")
+
+const canvas = document.getElementById("draw");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx.lineCap = "round";
+ctx.lineJoin = 'round';
+ctx.lineWidth = 20;
+ctx.strokeStyle = "blue";
+ctx.globalCompositeOperation = "xor"
+isDrawing = false;
+let hue = 0;
+
+function loadDrawing() {
+  const savedDrawing = localStorage.getItem('canvasDrawing');
+  if (savedDrawing) {
+    const img = new Image();
+    img.src = savedDrawing
+    img.onload = function() {
+      ctx.drawImage(img,0,0);
+    }
+  }
+}
+
+
+function colorChange() {
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+  hue++;
+}
+
+    function lineWidthChange() {
+  ctx.lineWidth += 10;
+      if (ctx.lineWidth === 100) {
+        ctx.lineWidth = 10
+      }
+
+    }
+
+
+function setDraw(e) {
+  isDrawing = true;
+
+  ctx.beginPath();
+
+  const x = e.pageX - canvas.offsetLeft;
+  const y = e.pageY - canvas.offsetTop;
+  lineWidthChange();
+  
+  ctx.moveTo(x,y)
+
+}
+
+function drawing(e) {
+  if (isDrawing === true) {
+
+  const x = e.pageX - canvas.offsetLeft;
+  const y = e.pageY - canvas.offsetTop;
+colorChange();
+
+    ctx.lineTo(x,y)
+    ctx.stroke();
+
+  
+  }
+}
+
+function stopDrawing() {
+  isDrawing = false;
+  saveDrawing();
+}
+
+
+function saveDrawing(){
+  localStorage.setItem('canvasDrawing', canvas.toDataURL());
+}
+
+
+window.onload = loadDrawing;
+canvas.addEventListener('mousedown', setDraw)
+canvas.addEventListener('mousemove', drawing)
+canvas.addEventListener('mouseup', stopDrawing)
+test.addEventListener('click', ()=>{
+  window.localStorage.clear();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+} )
+
+</script>
+
+<style>
+  html, body {
+    margin: 0;
+  }
+</style>
+
+</body>
+</html>
